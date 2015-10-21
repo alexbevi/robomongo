@@ -98,7 +98,7 @@ namespace Robomongo
         {
             BSONType t = elem.type();
 
-            stringstream s;
+            std::stringstream s;
             if ( includeFieldNames && !isArray)
                 s << '"' << escape( elem.fieldName() ) << "\" : ";
 
@@ -108,7 +108,7 @@ namespace Robomongo
                 break;
             case mongo::String:
             case Symbol:
-                s << '"' << escape( string(elem.valuestr(), elem.valuestrsize()-1) ) << '"';
+                s << '"' << escape( std::string(elem.valuestr(), elem.valuestrsize()-1) ) << '"';
                 break;
             case NumberLong:
                 s << "NumberLong(" << elem._numberLong() << ")";
@@ -117,8 +117,8 @@ namespace Robomongo
             case NumberDouble:
                 {
                     int sign=0;
-                    if ( elem.number() >= -numeric_limits< double >::max() &&
-                            elem.number() <= numeric_limits< double >::max() ) {
+                    if ( elem.number() >= -std::numeric_limits< double >::max() &&
+                            elem.number() <= std::numeric_limits< double >::max() ) {
                         s.precision( 16 );
                         s << elem.number();
                     }
@@ -131,7 +131,7 @@ namespace Robomongo
                     else {
                         StringBuilder ss;
                         ss << "Number " << elem.number() << " cannot be represented in JSON";
-                        string message = ss.str();
+                        std::string message = ss.str();
                         //massert( 10311 ,  message.c_str(), false );
                     }
                     break;
@@ -228,10 +228,10 @@ namespace Robomongo
                 s << "{ \"$binary\" : \"";
                 char *start = ( char * )( elem.value() ) + sizeof( int ) + 1;
                 base64::encode( s , start , len );
-                s << "\", \"$type\" : \"" << hex;
+                s << "\", \"$type\" : \"" << std::hex;
                 s.width( 2 );
                 s.fill( '0' );
-                s << type << dec;
+                s << type << std::dec;
                 s << "\" }";
                 break;
             }
