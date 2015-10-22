@@ -17,13 +17,15 @@ namespace Robomongo
 {
     Logger::Logger()
     {
-        qRegisterMetaType<::mongo::logger::LogSeverity>("::mongo::logger::LogSeverity");
+        // FIXME
+        //qRegisterMetaType<::mongo::logger::LogSeverity>("::mongo::logger::LogSeverity");
         std::string path = getLoggerPath();
         QFile file(QtUtils::toQString(path)); //delete file if it size more than 5mb
         if (file.exists() && file.size() > 5 * 1024 * 1024) {
             file.remove();
         }
-        mongo::initLogging(path,true);
+        // FIXME?
+        //mongo::initLogging(path,true);
     }
 
     Logger::~Logger()
