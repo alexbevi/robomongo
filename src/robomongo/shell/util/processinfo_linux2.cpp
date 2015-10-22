@@ -37,10 +37,10 @@
 #include <gnu/libc-version.h>
 #include <sys/utsname.h>
 
-#include "processinfo.h"
+#include <mongo/util/processinfo.h>
 #include "boost/filesystem.hpp"
 #include <mongo/util/file.h>
-#include "mongo/util/log.h"
+#include <mongo/util/log.h>
 
 using namespace std;
 
