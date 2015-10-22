@@ -57,6 +57,10 @@ using std::endl;
 using std::set;
 using std::string;
 
+#ifdef ROBOMONGO
+    volatile bool Scope::_interruptFlag = false;
+#endif
+
 AtomicInt64 Scope::_lastVersion(1);
 
 namespace {
