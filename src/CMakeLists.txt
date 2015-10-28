@@ -352,10 +352,11 @@ IF(MINGW OR CMAKE_COMPILER_IS_GNUCXX OR APPLE)
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LIBMONGOCLIENT_RELEASE_FILENAME}  ${MONGOCLIENT_RELEASE_LIBRARY}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
                     COMMENT "Build mongoclient library")
-            ELSE()                
+            ELSE()            
+                message("${LIBMONGOCLIENT_RELEASE_FILENAME} ${MONGOCLIENT_RELEASE_LIBRARY}")    
                 ADD_CUSTOM_TARGET(build_mongoclient
                     COMMAND scons --dbg=on ${MONGODB_COMMAND}
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LIBMONGOCLIENT_RELEASE_FILENAME}  ${MONGOCLIENT_RELEASE_LIBRARY}
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different /home/alex/workspaces/cpp/robomongo/src/third-party/mongo-cxx-driver-legacy/build/linux2/64/libmongoclient.a  ${MONGOCLIENT_RELEASE_LIBRARY}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
                     COMMENT "Build mongoclient library")
             ENDIF()
