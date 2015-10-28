@@ -1,14 +1,15 @@
 IF(BOOST_ENABLED)
+    FIND_PACKAGE(BOOST)
     INTEGRATE_BOOST(thread system filesystem)
 ENDIF()
 ADD_SUBDIRECTORY(third-party/qjson)
 ADD_SUBDIRECTORY(third-party/qscintilla/Qt4Qt5)
-ADD_SUBDIRECTORY(third-party/mongodb/src/third_party/js-1.7)
+ADD_SUBDIRECTORY(third-party/js-1.7)
 
 SET(PCRE_BUILD_TESTS OFF CACHE BOOL "Build the tests pcre tests.")
 SET(PCRE_BUILD_PCREGREP OFF CACHE BOOL "Build pcregrep")
-ADD_SUBDIRECTORY(third-party/mongodb/src/third_party/pcre-8.30 pcrecpp)
-
+ADD_SUBDIRECTORY(third-party/pcre-8.37 pcrecpp)
+ 
 SET(HEADERS_GUI_TO_MOC
     robomongo/gui/dialogs/ConnectionsDialog.h
     robomongo/gui/dialogs/ConnectionDialog.h
@@ -254,13 +255,14 @@ ELSEIF(UNIX)
     #SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ENDIF()
 
+# FIXME(alexbevi)
 IF(BOOST_ENABLED)
     SET(ALL_LIBS ${ALL_LIBS} ${Boost_LIBRARIES})
     SET(MONGODB_EXTRAPATH "${MONGODB_EXTRAPATH} ${BOOST_ROOT}")
 ELSE()   
     ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
-    ADD_SUBDIRECTORY(third-party/mongodb/src/third_party/boost)
-    SET(INCLUDE_DIRS ${INCLUDE_DIRS} third-party/mongodb/src/third_party/boost)
+    ADD_SUBDIRECTORY(third-party/boost)
+    SET(INCLUDE_DIRS ${INCLUDE_DIRS} third-party/boost/boost)
     SET(ALL_LIBS ${ALL_LIBS} boost_mongo_third_party)
 ENDIF()
 
@@ -286,24 +288,26 @@ IF(SSH_ENABLED)
     SET(SOURCES_GUI ${SOURCES_GUI}
         robomongo/gui/dialogs/SSHTunnelTab.cpp
     )
-    ADD_SUBDIRECTORY(third-party/mongodb/src/third_party/libssh2)
+    ADD_SUBDIRECTORY(third-party/libssh2)
     SET(ALL_LIBS ${ALL_LIBS} libssh2_third_party)    
 ENDIF(SSH_ENABLED)
 
-IF(NOT MONGODB_EXTRAPATH STREQUAL "")
-    STRING(REGEX REPLACE "([^\ ]+)" "\\1," MONGODB_EXTRAPATH_OUT ${MONGODB_EXTRAPATH})
-    
-    # Remove trailing comma
-    STRING(REGEX REPLACE ",$" "" MONGODB_EXTRAPATH_OUT_CLEAR ${MONGODB_EXTRAPATH_OUT})    
-    
-    # Remove spaces
-    STRING(REGEX REPLACE "([ ]+)" "" MONGODB_EXTRAPATH_OUT_CLEAR_NO_SPACES ${MONGODB_EXTRAPATH_OUT_CLEAR})    
-    
-    SET(MONGODB_COMMAND ${MONGODB_COMMAND} --extrapath=${MONGODB_EXTRAPATH_OUT_CLEAR_NO_SPACES})
-    SET(ALL_LIBS ${ALL_LIBS} ${OPENSSL_LIBRARIES})
-ENDIF()
+# FIXME(alexbevi)
+#IF(NOT MONGODB_EXTRAPATH STREQUAL "")
+#    STRING(REGEX REPLACE "([^\ ]+)" "\\1," MONGODB_EXTRAPATH_OUT ${MONGODB_EXTRAPATH})
+#    
+#    # Remove trailing comma
+#    STRING(REGEX REPLACE ",$" "" MONGODB_EXTRAPATH_OUT_CLEAR ${MONGODB_EXTRAPATH_OUT})    
+#    
+#    # Remove spaces
+#    STRING(REGEX REPLACE "([ ]+)" "" MONGODB_EXTRAPATH_OUT_CLEAR_NO_SPACES ${MONGODB_EXTRAPATH_OUT_CLEAR})    
+#    
+#    SET(MONGODB_COMMAND ${MONGODB_COMMAND} --extrapath=${MONGODB_EXTRAPATH_OUT_CLEAR_NO_SPACES})
+#    SET(ALL_LIBS ${ALL_LIBS} ${OPENSSL_LIBRARIES})
+#ENDIF()
 
-SET(MONGODB_COMMAND ${MONGODB_COMMAND} --${ARCH_TEXT} mongoclient)
+# XXX: sudo apt-get install libboost-regex-dev libboost-thread-dev
+SET(MONGODB_COMMAND ${MONGODB_COMMAND} --${ARCH_TEXT} --sharedclient)
 
 SET(HEADERS ${HEADERS} ${HEADERS_GUI} ${HEADERS_CORE} ${HEADERS_SHELL})
 SET(SOURCES ${SOURCES} ${SOURCES_GUI} ${SOURCES_SHELL} ${SOURCES_CORE})
@@ -312,7 +316,7 @@ SET(HEADERS_TOMOC ${HEADERS_GUI_TO_MOC} ${HEADERS_CORE_TO_MOC})
 QTX_WRAP_CPP(MOC_FILES ${HEADERS_TOMOC})
 SET(RESOURCES robomongo/gui/resources/gui.qrc)
 QTX_ADD_RESOURCES(RES_SRC ${RESOURCES})
-SET(INCLUDE_DIRS ${INCLUDE_DIRS} ${CMAKE_CURRENT_LIST_DIR} third-party/mongodb/src/third_party/pcre-8.30 third-party/qscintilla/Qt4Qt5 third-party/qjson third-party/mongodb/src)
+SET(INCLUDE_DIRS ${INCLUDE_DIRS} ${CMAKE_CURRENT_LIST_DIR} third-party/pcre-8.37 third-party/qscintilla/Qt4Qt5 third-party/qjson third-party/mongo-cxx-driver-legacy/src)
 INCLUDE_DIRECTORIES(${INCLUDE_DIRS} )
 SOURCE_GROUP("Header Files" FILES ${HEADERS} ${HEADERS_TOMOC})
 SOURCE_GROUP("Source Files" FILES ${SOURCES})
@@ -329,30 +333,30 @@ SET(ROBOMONGO_EXECUTABLE_SOURCES robomongo/app/main.cpp ${RES_SRC} ${ICON_FILE} 
 IF(MINGW OR CMAKE_COMPILER_IS_GNUCXX OR APPLE)
     IF(BOOST_ENABLED)
             IF ("${CMAKE_BUILD_TYPE_STABLE}" STREQUAL "RELEASE")
-                ADD_CUSTOM_TARGET(build_mongoclient
+                ADD_CUSTOM_TARGET(build_mongoclient                    
                     COMMAND scons --release ${MONGODB_COMMAND}
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LIBMONGOCLIENT_RELEASE_FILENAME}  ${MONGOCLIENT_RELEASE_LIBRARY}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongodb
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
                     COMMENT "Build mongoclient library")
             ELSE()
                 ADD_CUSTOM_TARGET(build_mongoclient
                     COMMAND scons -d ${MONGODB_COMMAND}
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LIBMONGOCLIENT_RELEASE_FILENAME}  ${MONGOCLIENT_RELEASE_LIBRARY}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongodb
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
                     COMMENT "Build mongoclient library")
             ENDIF()
         ELSE()
-            IF ("${CMAKE_BUILD_TYPE_STABLE}" STREQUAL "RELEASE")
+            IF ("${CMAKE_BUILD_TYPE_STABLE}" STREQUAL "RELEASE")            
                 ADD_CUSTOM_TARGET(build_mongoclient
                     COMMAND scons --release ${MONGODB_COMMAND}
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LIBMONGOCLIENT_RELEASE_FILENAME}  ${MONGOCLIENT_RELEASE_LIBRARY}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongodb
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
                     COMMENT "Build mongoclient library")
-            ELSE()
+            ELSE()                
                 ADD_CUSTOM_TARGET(build_mongoclient
-                    COMMAND scons --d ${MONGODB_COMMAND}
+                    COMMAND scons --dbg=on ${MONGODB_COMMAND}
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LIBMONGOCLIENT_RELEASE_FILENAME}  ${MONGOCLIENT_RELEASE_LIBRARY}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongodb
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
                     COMMENT "Build mongoclient library")
             ENDIF()
     ENDIF()
@@ -372,23 +376,23 @@ ELSEIF(MSVC)
         ADD_CUSTOM_TARGET(mongoclient_release
             COMMAND call scons --release ${MONGODB_COMMAND}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different \"${LIBMONGOCLIENT_RELEASE_FILENAME}\" \"${MONGOCLIENT_RELEASE_LIBRARY}\"
-            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongodb
+            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
             COMMENT "Build mongoclient release library")
         ADD_CUSTOM_TARGET(mongoclient_debug
             COMMAND call scons --d ${MONGODB_COMMAND}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different \"${LIBMONGOCLIENT_RELEASE_FILENAME}\" \"${MONGOCLIENT_DEBUG_LIBRARY}\"
-            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongodb
+            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
             COMMENT "Build mongoclient debug library")
     ELSE(BOOST_ENABLED)
         ADD_CUSTOM_TARGET(mongoclient_release
             COMMAND call scons --release ${MONGODB_COMMAND}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different \"${LIBMONGOCLIENT_RELEASE_FILENAME}\" \"${MONGOCLIENT_RELEASE_LIBRARY}\"
-            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongodb
+            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
             COMMENT "Build mongoclient release library")
         ADD_CUSTOM_TARGET(mongoclient_debug
             COMMAND call scons --d ${MONGODB_COMMAND}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different \"${LIBMONGOCLIENT_RELEASE_FILENAME}\" \"${MONGOCLIENT_DEBUG_LIBRARY}\"
-            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongodb
+            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
             COMMENT "Build mongoclient debug library")
     ENDIF(BOOST_ENABLED)
     SET(MONGO_LIBRARIES optimized ${MONGOCLIENT_RELEASE_LIBRARY} debug ${MONGOCLIENT_DEBUG_LIBRARY})

@@ -54,7 +54,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 set(ROBOMONGO_QT_VERSION 5 CACHE STRING "Qt version to use when building Robomongo (can be 4 or 5)")
-OPTION(BOOST_ENABLED "Enable boost system support" OFF)
+OPTION(BOOST_ENABLED "Enable boost system support" ON)
 OPTION(OPENSSL_ENABLED "Enable openssl support" ON)
 OPTION(SSH_ENABLED "Enable ssh support" ON)
 OPTION(CPACK_SUPPORT "Enable package support" ON)
