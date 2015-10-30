@@ -93,8 +93,6 @@ namespace Robomongo
         for (QList<CredentialSettings *>::iterator it = cred.begin(); it != cred.end(); ++it) {
             addCredential((*it)->clone());
         }
-
-         _info = new mongo::HostAndPort(_hostName, _port);
     }
 
     /**

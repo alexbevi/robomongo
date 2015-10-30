@@ -121,24 +121,24 @@ SET(HEADERS_SHELL
     robomongo/shell/db/json.h
     robomongo/shell/db/ptimeutil.h)
 SET(SOURCES_SHELL
-    robomongo/shell/scripting/utils.cpp
-    robomongo/shell/scripting/sm_db.cpp
-    robomongo/shell/scripting/engine_spidermonkey.cpp
-    robomongo/shell/scripting/engine.cpp
+    #robomongo/shell/scripting/utils.cpp
+    #robomongo/shell/scripting/sm_db.cpp
+    #robomongo/shell/scripting/engine_spidermonkey.cpp
+    #robomongo/shell/scripting/engine.cpp
     robomongo/shell/mongo.cpp
     #robomongo/shell/util/version.cpp
-    robomongo/shell/util/processinfo.cpp
-    robomongo/shell/shell/shell_utils.cpp
-    robomongo/shell/shell/shell_utils_launcher.cpp
-    robomongo/shell/shell/shell_utils_extended.cpp
-    robomongo/shell/util/ramlog.cpp
-    robomongo/shell/mongo-server.cpp
-    robomongo/shell/util/base64.cpp
-    robomongo/shell/util/file.cpp
-    robomongo/shell/scripting/bench.cpp
-    robomongo/shell/scripting/bson_template_evaluator.cpp
-    robomongo/shell/db/json.cpp
-    robomongo/shell/db/ptimeutil.cpp
+    #robomongo/shell/util/processinfo.cpp
+    #robomongo/shell/shell/shell_utils.cpp
+    #robomongo/shell/shell/shell_utils_launcher.cpp
+    #robomongo/shell/shell/shell_utils_extended.cpp
+    #robomongo/shell/util/ramlog.cpp
+    #robomongo/shell/mongo-server.cpp
+    #robomongo/shell/util/base64.cpp
+    #robomongo/shell/util/file.cpp
+    #robomongo/shell/scripting/bench.cpp
+    #robomongo/shell/scripting/bson_template_evaluator.cpp
+    #robomongo/shell/db/json.cpp
+    #robomongo/shell/db/ptimeutil.cpp
     )
 
 SET(HEADERS_CORE_TO_MOC
@@ -356,7 +356,7 @@ IF(MINGW OR CMAKE_COMPILER_IS_GNUCXX OR APPLE)
                 message("${LIBMONGOCLIENT_RELEASE_FILENAME} ${MONGOCLIENT_RELEASE_LIBRARY}")    
                 ADD_CUSTOM_TARGET(build_mongoclient
                     COMMAND scons --dbg=on ${MONGODB_COMMAND}
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different /home/alex/workspaces/cpp/robomongo/src/third-party/mongo-cxx-driver-legacy/build/linux2/64/libmongoclient.a  ${MONGOCLIENT_RELEASE_LIBRARY}
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different /home/alex/workspaces/cpp/robomongo/src/third-party/mongo-cxx-driver-legacy/build/linux2/64/dbg_on/libmongoclient.a  ${MONGOCLIENT_RELEASE_LIBRARY}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/third-party/mongo-cxx-driver-legacy
                     COMMENT "Build mongoclient library")
             ENDIF()

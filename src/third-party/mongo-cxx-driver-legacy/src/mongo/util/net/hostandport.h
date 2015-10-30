@@ -105,6 +105,20 @@ struct MONGO_CLIENT_API HostAndPort {
         return _port >= 0;
     }
 
+// #ifdef ROBOMONGO
+    void setHost(const std::string& host) {
+        _host = host;
+    }
+#ifdef MONGO_SSL
+    Robomongo::SSLInfo sslInfo() const {return _sslInfo;}
+    void setSslInfo(const Robomongo::SSLInfo &info) {_sslInfo = info;}
+#endif
+#ifdef SSH_SUPPORT_ENABLED
+    Robomongo::SSHInfo sshInfo() const {return _sshInfo;}
+    void setSshInfo(const  Robomongo::SSHInfo &info) {_sshInfo = info;}
+#endif
+// #endif
+
 private:
     std::string _host;
     int _port;  // -1 indicates unspecified

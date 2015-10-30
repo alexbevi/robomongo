@@ -56,12 +56,12 @@ namespace Robomongo
 
     inline std::ostream& operator<< (std::ostream& stream, const SSLInfo& info)
     {
-        stream << info.toBSONObj().toString();      
+        stream << info.toBSONObj().toString();
         return stream;
     }
 
-    inline bool operator==(const SSLInfo& r,const SSLInfo& l) 
-    { 
+    inline bool operator==(const SSLInfo& r,const SSLInfo& l)
+    {
         return r._sslSupport == l._sslSupport && r._sslPEMKeyFile == l._sslPEMKeyFile;
     }
 #endif
@@ -87,14 +87,14 @@ namespace Robomongo
         std::string _passphrase;
     };
 
-    inline bool operator==(const PublicKey& r,const PublicKey& l) 
-    { 
+    inline bool operator==(const PublicKey& r,const PublicKey& l)
+    {
         return r._publicKey == l._publicKey && r._privateKey == l._privateKey && r._passphrase == l._passphrase;
     }
 
     inline std::ostream& operator<< (std::ostream& stream, const PublicKey& key)
     {
-        stream << key.toBSONObj().toString();   
+        stream << key.toBSONObj().toString();
         return stream;
     }
 
@@ -115,14 +115,14 @@ namespace Robomongo
         SSHInfo(const std::string &hostName, int port, const std::string &userName,  const std::string &password, const PublicKey &publicKey, SupportedAuthenticationMetods method)
             :_hostName(hostName),_port(port),_userName(userName),_password(password),_publicKey(publicKey),_currentMethod(method)
         {
-           
+
         }
 
         explicit SSHInfo(const mongo::BSONElement &elem):_hostName(DEFAULT_SSH_HOST),_userName(),_port(DEFAULT_SSH_PORT),_password(),_publicKey(),_currentMethod(UNKNOWN)
         {
             if(!elem.eoo()){
                 mongo::BSONObj obj = elem.Obj();
-                _hostName = obj.getField("host").String();            
+                _hostName = obj.getField("host").String();
                 _port = obj.getField("port").Int();
                 _userName = obj.getField("user").String();
                 _password = obj.getField("password").String();
@@ -142,7 +142,7 @@ namespace Robomongo
 
         std::string _hostName;
         int _port;
-        std::string _userName;        
+        std::string _userName;
         std::string _password;
         PublicKey _publicKey;
         SupportedAuthenticationMetods _currentMethod;
@@ -154,8 +154,8 @@ namespace Robomongo
         return stream;
     }
 
-    inline bool operator==(const SSHInfo& r,const SSHInfo& l) 
-    { 
+    inline bool operator==(const SSHInfo& r,const SSHInfo& l)
+    {
         return r._hostName == l._hostName && r._password == l._password && r._port == l._port && r._publicKey==l._publicKey && r._userName == l._userName && r._publicKey == l._publicKey;
     }
 #endif
@@ -177,7 +177,7 @@ namespace mongo {
         HostAndPort(const std::string& s);
 
         /** @param p port number. -1 is ok to use default. */
-        HostAndPort(const std::string& h, int p /*= -1*/) : _host(h), _port(p) { 
+        HostAndPort(const std::string& h, int p /*= -1*/) : _host(h), _port(p) {
             verify( !str::startsWith(h, '#') );
         }
 #ifdef ROBOMONGO
@@ -214,15 +214,7 @@ namespace mongo {
                 return port() < r.port();
             return false;
         }
-#ifdef ROBOMONGO
-        bool operator==(const HostAndPort& r) const { 
-            return host() == r.host() && port() == r.port() && sshInfo() == r.sshInfo() && sslInfo() == r.sslInfo(); 
-        }
-#else
-        bool operator==(const HostAndPort& r) const { 
-            return host() == r.host() && port() == r.port(); 
-        }
-#endif
+
         bool operator!=(const HostAndPort& r) const { return !(*this == r); }
 
         /* returns true if the host/port combo identifies this process instance. */
@@ -276,7 +268,7 @@ namespace mongo {
         int _port; // -1 indicates unspecified
 #ifdef ROBOMONGO
 #ifdef MONGO_SSL
-       Robomongo::SSLInfo _sslInfo; 
+       Robomongo::SSLInfo _sslInfo;
 #endif // MONGO_SSL
 #ifdef SSH_SUPPORT_ENABLED
         Robomongo::SSHInfo _sshInfo;
@@ -390,7 +382,7 @@ namespace mongo {
         int jsonLen = strlen(options);
         int offset = 0;
         while(offset!=jsonLen)
-        { 
+        {
             mongo::BSONObj main = mongo::fromjson(options+offset,&len);
             mongo::BSONElement ssl = main.getField("SSL");
             mongo::BSONElement ssh = main.getField("SSH");
@@ -402,7 +394,7 @@ namespace mongo {
             }
             offset+=len;
         }
-        
+
 #else
         const char *colon = strrchr(p, ':');
         if( colon ) {

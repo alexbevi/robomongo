@@ -21,8 +21,10 @@
 
 #pragma once
 
+#ifndef ROBOMONGO
 #ifdef MONGO_EXPOSE_MACROS
 #error dbclient.h is for C++ driver consumer use only
+#endif
 #endif
 
 // Consumers of the MongoDB C++ client library must define STATIC_LIBMONGOCLIENT when including
